@@ -30,10 +30,17 @@ be safely run again.
 
 ## Environment setup on Windows
 
+Use Python 3.14 or a compatible newer 3.x release. The current environment is tested
+with Python 3.14.7. Check the installed interpreter before creating the environment:
+
+```powershell
+py --version
+```
+
 Open PowerShell in the repository root and create the virtual environment:
 
 ```powershell
-py -m venv .venv
+py -3.14 -m venv .venv
 ```
 
 Activate it:
