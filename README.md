@@ -49,11 +49,12 @@ again:
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 ```
 
-Upgrade `pip` and install the project dependencies:
+Upgrade `pip` and install the pinned project dependencies from
+[`requirements.txt`](requirements.txt):
 
 ```powershell
 python -m pip install --upgrade pip
-python -m pip install pandas numpy pyarrow scikit-learn jupyterlab
+python -m pip install -r requirements.txt
 ```
 
 The packages are used for:
