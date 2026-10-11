@@ -91,6 +91,10 @@ Open `setup.ipynb` and run the code cell. It checks for
 `data-2026-01.parquet` through `data-2026-09.parquet` and downloads only files that are
 missing.
 
+After the data is available, open
+[`data_audit.ipynb`](notebooks/data_audit.ipynb) to review the dataset shape, variable
+types, missing values, duplicates, target distribution, and potential delay outliers.
+
 ## Responsible use and limitations
 
 The dataset does not contain personal information and is openly licensed, so direct
