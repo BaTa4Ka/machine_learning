@@ -1,0 +1,1 @@
+#This script is supposed to be used to get macro F1 score for given model/baseline
