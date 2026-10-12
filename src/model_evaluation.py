@@ -20,6 +20,7 @@ def macro_f1_test(
     y_test: Sequence[Any],
     *,
     model_name: str | None = None,
+    predictions: Sequence[Any] | None = None,
 ) -> dict[str, Any]:
     """Evaluate one fitted classifier on a held-out test set.
 
@@ -38,6 +39,10 @@ def macro_f1_test(
         True test labels.
     model_name:
         Optional display name for the returned result.
+    predictions:
+        Optional predictions that were already generated for this test set.
+        Supplying them allows callers to reuse stochastic predictions across
+        multiple metrics or diagnostic tables.
 
     Returns
     -------
@@ -59,7 +64,8 @@ def macro_f1_test(
     if not labels:
         raise ValueError("y_test must contain at least one label")
 
-    predictions = model.predict(X_test)
+    if predictions is None:
+        predictions = model.predict(X_test)
     if len(predictions) != len(labels):
         raise ValueError(
             "The number of predictions must match the number of test labels: "
