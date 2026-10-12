@@ -90,6 +90,7 @@ def chronological_split(
     *,
     train_fraction: float = 0.70,
     validation_fraction: float = 0.15,
+    sort_column: str = "arrival_planned_time",
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """Split rows chronologically into train, validation, and test sets.
 
@@ -105,10 +106,10 @@ def chronological_split(
         raise ValueError("train and validation fractions must leave test rows")
     if data.empty:
         raise ValueError("Cannot split an empty dataset")
-    if "arrival_planned_time" not in data:
-        raise KeyError("data must contain arrival_planned_time")
+    if sort_column not in data:
+        raise KeyError(f"data must contain {sort_column}")
 
-    ordered = data.sort_values("arrival_planned_time", kind="stable").reset_index(
+    ordered = data.sort_values(sort_column, kind="stable").reset_index(
         drop=True
     )
     train_end = int(len(ordered) * train_fraction)
