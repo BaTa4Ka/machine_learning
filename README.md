@@ -25,8 +25,9 @@ data/data-2026-09.parquet
 
 The files are large and are intentionally excluded from version control. Run
 [`notebooks/setup.ipynb`](notebooks/setup.ipynb) to create `data/` and download any
-missing monthly files. The setup cell checks each file before downloading it, so it can
-be safely run again.
+missing monthly files. The notebook calls the reusable downloader in
+[`src/download_data.py`](src/download_data.py), checks each file before downloading it,
+and can be safely run again.
 
 ## Environment setup on Windows
 
@@ -79,8 +80,8 @@ deactivate
 
 ## Running the data setup notebook
 
-With `.venv` activated, start Jupyter from the `notebooks` directory so the setup cell's
-`../data` path points to the repository's `data/` directory:
+With `.venv` activated, start Jupyter from the `notebooks` directory so the notebook can
+resolve the repository root:
 
 ```powershell
 Set-Location notebooks
@@ -89,7 +90,7 @@ jupyter lab
 
 Open `setup.ipynb` and run the code cell. It checks for
 `data-2026-01.parquet` through `data-2026-09.parquet` and downloads only files that are
-missing.
+missing. Incomplete downloads are removed automatically.
 
 After the data is available, open
 [`data_audit.ipynb`](notebooks/data_audit.ipynb) to review the dataset shape, variable
