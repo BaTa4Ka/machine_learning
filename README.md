@@ -96,6 +96,40 @@ After the data is available, open
 [`data_audit.ipynb`](notebooks/data_audit.ipynb) to review the dataset shape, variable
 types, missing values, duplicates, target distribution, and potential delay outliers.
 
+## Preprocessing and evaluation design
+
+The preprocessing workflow is implemented in
+[`src/prep_job.py`](src/prep_job.py) and demonstrated in
+[`notebooks/preprocessing.ipynb`](notebooks/preprocessing.ipynb).
+
+The data is ordered by a unified `planned_time` value. `arrival_planned_time` is used
+when available, with `departure_planned_time` as a fallback. Rows with neither
+timestamp are removed because they cannot be placed reliably in chronological order.
+
+The remaining data is split chronologically into:
+
+- 70% training data;
+- 15% validation data;
+- 15% test data.
+
+Preprocessing is applied independently after the split. It removes delays below
+`-1` minute and above `180` minutes, derives the first station, removes rows without
+a derivable first station, removes RE rows without a line number, and creates a
+`day_of_week` feature from `time`. The original arrival and departure schedule
+columns are replaced by `planned_time`.
+
+The training partition is used to fit models, the validation partition is reserved
+for model selection and tuning, and the test partition is kept untouched until final
+evaluation. Random cross-validation should not be used across the full dataset because
+it can mix earlier and later observations. If cross-validation is needed, it should
+preserve chronological order within the training period.
+
+The baseline workflow is in
+[`notebooks/baseline.ipynb`](notebooks/baseline.ipynb). It uses the same preprocessing
+pipeline and reports accuracy and macro-F1 separately for IC, ICE, and RE. Macro-F1
+is the primary metric because it gives each delay class equal weight, while accuracy
+can be dominated by the most common class.
+
 ## Responsible use and limitations
 
 The dataset does not contain personal information and is openly licensed, so direct
