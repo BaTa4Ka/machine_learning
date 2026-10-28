@@ -18,6 +18,7 @@ REQUIRED_COLUMNS = {
     "line_number",
     "station_name",
     "train_number",
+    "train_line_ride_id",
     "train_line_station_num",
     "final_destination_station",
 }
@@ -119,26 +120,16 @@ def _validate_columns(data: pd.DataFrame) -> None:
 
 
 def add_first_station(data: pd.DataFrame) -> pd.DataFrame:
-    """Derive the first station using the service-specific route identifier."""
+    """Derive the first station using the train-line ride identifier."""
     result = data.copy()
-    result["_first_station_group"] = result["train_number"].astype("string")
-    re_rows = result["train_type"].eq("RE")
-    result.loc[re_rows, "_first_station_group"] = result.loc[
-        re_rows, "line_number"
-    ]
-    result["_first_station_group"] = result["_first_station_group"].astype(
-        "string"
-    )
-    group_columns = ["train_type", "_first_station_group"]
     first_stations = (
         result[result["train_line_station_num"] == 1]
-        .groupby(group_columns, dropna=False)["station_name"]
+        .groupby("train_line_ride_id", dropna=False)["station_name"]
         .first()
         .rename("first_station")
     )
     result = result.drop(columns=["first_station"], errors="ignore")
-    result = result.join(first_stations, on=group_columns)
-    return result.drop(columns=["_first_station_group"])
+    return result.join(first_stations, on="train_line_ride_id")
 
 
 def preprocess_split(
@@ -171,7 +162,14 @@ def preprocess_split(
         ].fillna(result["station_name"])
 
     return result.drop(
-        columns=["arrival_planned_time", "departure_planned_time"]
+        columns=[
+            "arrival_planned_time",
+            "departure_planned_time",
+            "eva",
+            "source_file",
+            "train_line_ride_id",
+        ],
+        errors="ignore",
     )
 
 

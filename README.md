@@ -95,6 +95,14 @@ missing. Incomplete downloads are removed automatically.
 After the data is available, open
 [`data_audit.ipynb`](notebooks/data_audit.ipynb) to review the dataset shape, variable
 types, missing values, duplicates, target distribution, and potential delay outliers.
+The categorical feature analysis is in
+[`one_hot_features_audit.ipynb`](notebooks/one_hot_features_audit.ipynb); it reviews
+planned hour, day of week, line number, station name, and train number before encoding.
+The one-hot audit uses the average number of rows per unique value as a reasonable
+starting threshold for excluding sparse values. The threshold is calculated separately
+for each categorical feature. This is a practical initial rule, not a final modelling
+decision; it should be revisited using validation results and the resulting feature
+dimensionality.
 
 ## Preprocessing and evaluation design
 
@@ -116,7 +124,13 @@ Preprocessing is applied independently after the split. It removes delays below
 `-1` minute and above `180` minutes, derives the first station, removes rows without
 a derivable first station, removes RE rows without a line number, and creates a
 `day_of_week` feature from `time`. The original arrival and departure schedule
-columns are replaced by `planned_time`.
+columns are replaced by `planned_time`. `station_name` is retained as the
+human-readable station feature, and `train_line_station_num` is retained because
+later stops may have accumulated more delay. The station-number field is used to
+derive `first_station` within each `train_line_ride_id`, which identifies the
+actual train-line journey. Technical identifiers such as
+`eva`, `source_file`, and `train_line_ride_id` are also removed from the processed
+partitions.
 
 The training partition is used to fit models, the validation partition is reserved
 for model selection and tuning, and the test partition is kept untouched until final
