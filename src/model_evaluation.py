@@ -10,10 +10,12 @@ from sklearn.metrics import accuracy_score, f1_score
 class PredictiveModel(Protocol):
     """The part of a fitted classifier required by the evaluation helpers."""
 
+    # Return predictions for a supplied feature matrix.
     def predict(self, X: Any) -> Any:
         """Return predictions for the supplied feature matrix."""
 
 
+# Evaluate one fitted model without changing its learned parameters.
 def macro_f1_test(
     model: PredictiveModel,
     X_test: Any,
@@ -60,10 +62,12 @@ def macro_f1_test(
     if not hasattr(model, "predict"):
         raise AttributeError("model must provide a predict(X_test) method")
 
+    # Materialize labels once so validation and metric calls use one length.
     labels = list(y_test)
     if not labels:
         raise ValueError("y_test must contain at least one label")
 
+    # Reuse supplied predictions when callers need consistent random results.
     if predictions is None:
         predictions = model.predict(X_test)
     if len(predictions) != len(labels):
@@ -85,6 +89,7 @@ def macro_f1_test(
     }
 
 
+# Compare multiple already-fitted models on the same held-out partition.
 def evaluate_models(
     models: Mapping[str, PredictiveModel],
     X_test: Any,
@@ -109,6 +114,7 @@ def evaluate_models(
     if not models:
         raise ValueError("models must contain at least one fitted model")
 
+    # Evaluate each model independently before sorting the comparison table.
     results = [
         macro_f1_test(model, X_test, y_test, model_name=name)
         for name, model in models.items()

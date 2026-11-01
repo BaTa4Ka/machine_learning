@@ -16,6 +16,7 @@ TARGET_LABELS = (
 )
 
 
+# Find and validate the expected monthly dataset files.
 def monthly_files(data_dir: Path | str) -> list[Path]:
     """Return the January-September 2026 source files in month order."""
     files = sorted(Path(data_dir).glob("data-2026-0[1-9].parquet"))
@@ -27,6 +28,7 @@ def monthly_files(data_dir: Path | str) -> list[Path]:
     return files
 
 
+# Load selected columns and filter the dataset to requested train types.
 def load_monthly_data(
     data_dir: Path | str,
     columns: Sequence[str],
@@ -35,12 +37,15 @@ def load_monthly_data(
     require_planned_time: bool = True,
 ) -> pd.DataFrame:
     """Load selected columns from the monthly files and filter service types."""
+    # Convert the iterable once so membership checks are efficient and reusable.
     selected_types = set(service_types)
     if not selected_types:
         raise ValueError("service_types must contain at least one train type")
 
+    # Keep monthly frames separate until all files have been read successfully.
     parts = []
     for file in monthly_files(data_dir):
+        # Read only the requested columns to reduce memory usage.
         frame = pd.read_parquet(file, columns=list(columns))
         frame = frame[frame["train_type"].isin(selected_types)].copy()
         frame["source_file"] = file.name
@@ -52,12 +57,14 @@ def load_monthly_data(
     return data
 
 
+# Create the five-class target from cancellation and delay information.
 def add_delay_target(
     data: pd.DataFrame,
     *,
     target_column: str = "target",
 ) -> pd.DataFrame:
     """Return labelled rows with the five-class delay target."""
+    # Keep the caller's raw frame unchanged while adding the target.
     result = data.copy()
     result["arrival_is_canceled"] = (
         result["arrival_is_canceled"].fillna(False).astype(bool)
@@ -85,6 +92,7 @@ def add_delay_target(
     return result
 
 
+# Sort by the selected time column and create chronological partitions.
 def chronological_split(
     data: pd.DataFrame,
     *,
@@ -109,12 +117,14 @@ def chronological_split(
     if sort_column not in data:
         raise KeyError(f"data must contain {sort_column}")
 
+    # Stable sorting preserves input order for equal timestamps.
     ordered = data.sort_values(sort_column, kind="stable").reset_index(
         drop=True
     )
     train_end = int(len(ordered) * train_fraction)
     validation_end = int(len(ordered) * (train_fraction + validation_fraction))
 
+    # Copy partitions so later operations cannot alter the ordered source frame.
     train = ordered.iloc[:train_end].copy()
     validation = ordered.iloc[train_end:validation_end].copy()
     test = ordered.iloc[validation_end:].copy()

@@ -9,6 +9,7 @@ DATASET_URL = (
 )
 
 
+# Ensure the requested monthly source files exist in the data directory.
 def download_monthly_data(
     data_dir: Path | str,
     *,
@@ -23,14 +24,17 @@ def download_monthly_data(
     if not 1 <= start_month <= end_month <= 12:
         raise ValueError("months must satisfy 1 <= start_month <= end_month <= 12")
 
+    # Create the destination directory before checking or downloading files.
     destination_dir = Path(data_dir)
     destination_dir.mkdir(parents=True, exist_ok=True)
     downloaded_files = []
 
+    # Process months in order so the returned list follows dataset order.
     for month in range(start_month, end_month + 1):
         filename = f"data-2026-{month:02d}.parquet"
         destination = destination_dir / filename
 
+        # Never overwrite an existing downloaded file.
         if destination.exists():
             print(f"Already exists: {destination}")
             downloaded_files.append(destination)
@@ -39,6 +43,7 @@ def download_monthly_data(
         url = f"{DATASET_URL}/{filename}?download=true"
         temporary_destination = destination.with_suffix(".parquet.download")
         print(f"Downloading {filename}...")
+        # Download to a temporary path so partial files are not treated as valid.
         try:
             urlretrieve(url, temporary_destination)
             temporary_destination.replace(destination)
