@@ -165,6 +165,7 @@ def preprocess_split(
     result = data.copy()
     # Derive calendar features from the observation and planned timestamps.
     result["day_of_week"] = pd.to_datetime(result["time"]).dt.day_name()
+    result["planned_hour"] = pd.to_datetime(result["planned_time"]).dt.hour
     # Exclude extreme delay values while retaining canceled rows with missing delay.
     result = result[
         result["delay_in_min"].between(-1, 180)

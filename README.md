@@ -104,6 +104,19 @@ for each categorical feature. This is a practical initial rule, not a final mode
 decision; it should be revisited using validation results and the resulting feature
 dimensionality.
 
+The model feature transformer is implemented in
+[`src/sklearn_preprocessing.py`](src/sklearn_preprocessing.py). It min-max scales
+`train_line_station_num` and one-hot encodes the selected categorical features.
+The transformer must be fitted on the training partition only and then applied to
+validation and test partitions. Unknown categories are ignored, and unused raw
+columns are dropped.
+
+The complete model-data workflow is available in
+[`src/model_data.py`](src/model_data.py). `prepare_model_data` runs the project
+preprocessing, fits the feature transformer on the training partition, transforms
+validation and test partitions, and returns `X_train`, `y_train`, `X_validation`,
+`y_validation`, `X_test`, and `y_test` for model training and evaluation.
+
 ## Preprocessing and evaluation design
 
 The preprocessing workflow is implemented in
