@@ -5,6 +5,11 @@ from typing import Any
 import numpy as np
 
 
+def _row_count(X: Any) -> int:
+    """Return the number of rows for dense or sparse feature matrices."""
+    return X.shape[0] if hasattr(X, "shape") else len(X)
+
+
 class RandomClassShareClassifier:
     """Predict labels randomly according to their fitted class frequencies."""
 
@@ -30,7 +35,7 @@ class RandomClassShareClassifier:
             raise RuntimeError("RandomClassShareClassifier must be fitted first")
         return self._rng.choice(
             self.classes_,
-            size=len(X),
+            size=_row_count(X),
             p=self.class_probabilities_,
         )
 
@@ -55,4 +60,4 @@ class MajorityClassClassifier:
     def predict(self, X: Any) -> np.ndarray:
         if not hasattr(self, "majority_class_"):
             raise RuntimeError("MajorityClassClassifier must be fitted first")
-        return np.full(len(X), self.majority_class_)
+        return np.full(_row_count(X), self.majority_class_)
