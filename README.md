@@ -111,11 +111,23 @@ The transformer must be fitted on the training partition only and then applied t
 validation and test partitions. Unknown categories are ignored, and unused raw
 columns are dropped.
 
+The separate [`src/boosted_preprocessing.py`](src/boosted_preprocessing.py)
+preprocessor is intended for boosted tree models. It keeps categorical features as
+aligned pandas categorical columns instead of one-hot encoding them, while learning
+rare-category and category-vocabulary rules from the training partition only.
+
 The complete model-data workflow is available in
 [`src/model_data.py`](src/model_data.py). `prepare_model_data` runs the project
 preprocessing, fits the feature transformer on the training partition, transforms
 validation and test partitions, and returns `X_train`, `y_train`, `X_validation`,
 `y_validation`, `X_test`, and `y_test` for model training and evaluation.
+
+The linear-model notebook is
+[`notebooks/linear_modeling.ipynb`](notebooks/linear_modeling.ipynb). The optional
+boosted-tree comparison is in
+[`notebooks/boosted_modeling.ipynb`](notebooks/boosted_modeling.ipynb); it uses
+bounded chronological samples for a quick XGBoost, LightGBM, and CatBoost comparison
+without using the test partition.
 
 ## Preprocessing and evaluation design
 
