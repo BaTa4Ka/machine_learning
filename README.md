@@ -169,6 +169,14 @@ pipeline and reports accuracy and macro-F1 separately for IC, ICE, and RE. Macro
 is the primary metric because it gives each delay class equal weight, while accuracy
 can be dominated by the most common class.
 
+## Model comparison
+
+See [`notebooks/model_comparison.ipynb`](notebooks/model_comparison.ipynb) for the
+complete model comparison, subgroup metrics, and confusion matrices. A concise draft
+summary is maintained in [`reports/README.md`](reports/README.md). LightGBM currently
+looks like the strongest overall model, although performance varies by train type and
+the five delay classes remain difficult to distinguish.
+
 ## Responsible use and limitations
 
 The dataset does not contain personal information and is openly licensed, so direct
